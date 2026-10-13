@@ -4,7 +4,7 @@ dotenv.config({ path: path.join(__dirname, '.env') });
 
 const express = require('express');
 const cors = require('cors');
-const { connectDB } = require('./config/db');
+const { connectDB, getIsMongooseConnected } = require('./config/db');
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 5001;
@@ -12,8 +12,46 @@ const PORT = process.env.ADMIN_PORT || 5001;
 // Disable ETags to ensure 200 OK responses instead of 304 Not Modified
 app.set('etag', false);
 
-// Middleware
-app.use(cors());
+// CORS configuration (supports local dev and Vercel domains)
+const defaultAllowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5174',
+  'http://127.0.0.1:3000',
+  'https://legalai-phi.vercel.app',
+];
+
+const envOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map((url) => url.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...defaultAllowedOrigins, ...envOrigins];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    return callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Cache-Control',
+    'Pragma',
+    'Expires',
+    'Accept',
+  ],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // Anti-caching headers middleware for real-time admin API
@@ -28,6 +66,18 @@ app.use((req, res, next) => {
 // Request logger for admin traceability
 app.use((req, res, next) => {
   console.log(`[Admin API] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
+// Ensure MongoDB Atlas is connected before servicing requests (Crucial for Vercel Serverless)
+app.use(async (req, res, next) => {
+  if (!getIsMongooseConnected()) {
+    try {
+      await connectDB();
+    } catch (err) {
+      console.warn('[Admin DB Middleware Notice] Database connection attempt:', err.message);
+    }
+  }
   next();
 });
 
@@ -46,9 +96,20 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 
+// 1. High priority: Mount Auth routes under both /api/admin/auth and /api/auth
+app.use('/api/admin/auth', authRoutes);
+app.use('/admin/auth', authRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
+// 2. Admin Suite Management routes
 app.use('/api/admin', adminRoutes);
+app.use('/admin', adminRoutes);
+app.use('/api', adminRoutes);
+
+// 3. Customer analytics routes for admin
 app.use('/api/customer', customerRoutes);
+app.use('/customer', customerRoutes);
 
 const { sendError } = require('./utils/responseHandler');
 const { ERROR } = require('./constants/appStrings');

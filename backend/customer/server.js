@@ -160,3 +160,6 @@ connectDB().then(async () => {
   });
 });
 
+module.exports = app;
+
+

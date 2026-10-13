@@ -8,6 +8,7 @@ export const OtpVerificationView = ({
   onResend,
   onCancel,
   loading = false,
+  error: externalError = '',
 }) => {
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
@@ -80,7 +81,7 @@ export const OtpVerificationView = ({
     }
   };
 
-  const handlePaste = (e) => {
+  const handlePaste = async (e) => {
     e.preventDefault();
     const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     if (!pasted) return;
@@ -97,11 +98,14 @@ export const OtpVerificationView = ({
     inputRefs.current[focusIdx]?.focus();
 
     if (digits.length === 6) {
-      onVerify(email, pasted, purpose);
+      const res = await onVerify(email, pasted, purpose);
+      if (res && !res.success && res.message) {
+        setError(res.message);
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e?.preventDefault();
     setError('');
     const fullCode = otpDigits.join('');
@@ -113,7 +117,10 @@ export const OtpVerificationView = ({
       setError('This verification code has expired. Please click "Resend Code".');
       return;
     }
-    onVerify(email, fullCode, purpose);
+    const res = await onVerify(email, fullCode, purpose);
+    if (res && !res.success && res.message) {
+      setError(res.message);
+    }
   };
 
   const handleResendClick = async () => {
@@ -183,7 +190,7 @@ export const OtpVerificationView = ({
       </div>
 
       {/* Error Banner */}
-      {error && (
+      {(error || externalError) && (
         <div
           style={{
             display: 'flex',
@@ -199,9 +206,10 @@ export const OtpVerificationView = ({
           }}
         >
           <AlertCircle size={15} style={{ flexShrink: 0 }} />
-          <span>{error}</span>
+          <span>{error || externalError}</span>
         </div>
       )}
+
 
       {/* 6 Segmented OTP Inputs */}
       <div

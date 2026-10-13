@@ -11,7 +11,8 @@ const connectDB = async () => {
     return mongoose.connection;
   }
 
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/themes-ai';
+  const DEFAULT_ATLAS_URI = 'mongodb+srv://divya1505shah_db_user:Divya%4015@cluster0.5iymkof.mongodb.net/themes-ai?retryWrites=true&w=majority&appName=Cluster0';
+  const mongoUri = process.env.MONGODB_URI || DEFAULT_ATLAS_URI;
   const isAtlas = mongoUri.startsWith('mongodb+srv');
   try {
     const conn = await mongoose.connect(mongoUri, {

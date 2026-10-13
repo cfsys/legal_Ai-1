@@ -63,7 +63,9 @@ const LoginPage = () => {
     } else {
       setError(res.message);
     }
+    return res;
   };
+
 
   const handleResendOtp = async (targetEmail, purpose) => {
     return await resendOtp(targetEmail, purpose);
@@ -110,7 +112,9 @@ const LoginPage = () => {
                 setError('');
               }}
               loading={otpLoading}
+              error={error}
             />
+
           ) : (
             <>
               {/* Header Badge & Title */}

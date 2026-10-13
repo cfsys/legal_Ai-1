@@ -134,7 +134,9 @@ const RegisterPage = () => {
     } else {
       setError(res.message);
     }
+    return res;
   };
+
 
   const handleResendOtp = async (targetEmail, purpose) => {
     return await resendOtp(targetEmail, purpose);
@@ -181,7 +183,9 @@ const RegisterPage = () => {
                 setError('');
               }}
               loading={otpLoading}
+              error={error}
             />
+
           ) : (
             <>
               {/* Header Badge & Title */}

@@ -1,0 +1,800 @@
+{
+  "info": {
+    "name": "Legal AI API Collection",
+    "description": "Comprehensive Postman Collection for testing all Legal AI backend APIs (Authentication, User Management, AI Research, Documents, Contracts, Matters, Tasks, Events, Drafts, Masters, Leads, and Health).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. System Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["api", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "1.1 Register Customer User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('authToken', res.data.token);",
+                  "    console.log('Saved authToken from Registration');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Arjun\",\n  \"lastName\": \"Sharma\",\n  \"email\": \"arjun.sharma@legalai.in\",\n  \"mobile\": \"+91 98765 43210\",\n  \"professionalType\": \"Advocate\",\n  \"organisationName\": \"Sharma Legal Chambers\",\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "1.2 Login as Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('authToken', res.data.token);",
+                  "    console.log('Saved authToken from Customer Login');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cfsys.xyz@gmail.com\",\n  \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "1.3 Login as Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('authToken', res.data.token);",
+                  "    console.log('Saved authToken from Admin Login');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@legalai.in\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "1.4 Google OAuth Login / Verify",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<GOOGLE_ID_TOKEN>\",\n  \"clientId\": \"223188447894-egelai42blktp0t05ji89jlthm6pqpmb.apps.googleusercontent.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/google",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "google"]
+            }
+          }
+        },
+        {
+          "name": "1.5 Get Current Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. AI Legal Research",
+      "item": [
+        {
+          "name": "2.1 Ask Legal AI Direct Question",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What are the mandatory grounds for condonation of delay under Section 5 of Limitation Act 1963?\",\n  \"court\": \"Supreme Court of India\",\n  \"area\": \"Civil Procedure\",\n  \"depth\": \"Detailed\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/research/ask",
+              "host": ["{{baseUrl}}"],
+              "path": ["research", "ask"]
+            }
+          }
+        },
+        {
+          "name": "2.2 Create Research Memorandum Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Is promissory estoppel applicable against statutory authorities under Indian jurisprudence?\",\n  \"jurisdiction\": \"Supreme Court of India\",\n  \"acts\": \"Constitution of India, Indian Contract Act 1872\",\n  \"depth\": \"Standard\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/research",
+              "host": ["{{baseUrl}}"],
+              "path": ["research"]
+            }
+          }
+        },
+        {
+          "name": "2.3 Get User Research History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/research",
+              "host": ["{{baseUrl}}"],
+              "path": ["research"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Judgments & Precedents",
+      "item": [
+        {
+          "name": "3.1 Search Judgments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/judgments?q=delay&court=Supreme Court of India&status=Good Law",
+              "host": ["{{baseUrl}}"],
+              "path": ["judgments"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "delay"
+                },
+                {
+                  "key": "court",
+                  "value": "Supreme Court of India"
+                },
+                {
+                  "key": "status",
+                  "value": "Good Law"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "3.2 Get Judgment by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/judgments/6620f12a3b4c5d6e7f8a9b0c",
+              "host": ["{{baseUrl}}"],
+              "path": ["judgments", "6620f12a3b4c5d6e7f8a9b0c"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Document Intelligence",
+      "item": [
+        {
+          "name": "4.1 Upload & Analyze Legal Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Commercial_Lease_Deed_Delhi_NCR.pdf\",\n  \"pages\": 18,\n  \"isConfidential\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents"]
+            }
+          }
+        },
+        {
+          "name": "4.2 Get All Documents",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/documents?status=Ready",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Ready"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "4.3 Run Document Action (Summarise / Clauses)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"Find Key Dates & Risks\",\n  \"question\": \"Identify any termination penalties or lock-in obligations\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/documents/{{documentId}}/action",
+              "host": ["{{baseUrl}}"],
+              "path": ["documents", "{{documentId}}", "action"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Contract Review",
+      "item": [
+        {
+          "name": "5.1 Create Contract Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Master Services Agreement v3.2\",\n  \"type\": \"Software & Cloud Consulting\",\n  \"content\": \"Client shall indemnify vendor against any and all claims arising out of data privacy breach without limitation of liability.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contracts",
+              "host": ["{{baseUrl}}"],
+              "path": ["contracts"]
+            }
+          }
+        },
+        {
+          "name": "5.2 Get All Contracts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contracts",
+              "host": ["{{baseUrl}}"],
+              "path": ["contracts"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Matters Management",
+      "item": [
+        {
+          "name": "6.1 Create Litigation Matter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Acme Infra Ltd. vs Union of India & Ors.\",\n  \"clientName\": \"Acme Infrastructure Limited\",\n  \"court\": \"Supreme Court of India\",\n  \"stage\": \"Notice Issued / Response Pending\",\n  \"nextHearingDate\": \"2026-11-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/matters",
+              "host": ["{{baseUrl}}"],
+              "path": ["matters"]
+            }
+          }
+        },
+        {
+          "name": "6.2 Get All Matters",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/matters",
+              "host": ["{{baseUrl}}"],
+              "path": ["matters"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Tasks & Calendar",
+      "item": [
+        {
+          "name": "7.1 Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"task\": \"File Rejoinder Affidavit in SLP(C) 14022/2026\",\n  \"due\": \"28 Oct 2026\",\n  \"priority\": \"High\",\n  \"status\": \"To Do\",\n  \"assignee\": \"Chirag Poshiya\",\n  \"matter\": \"Commercial Dispute - Acme Infra\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"]
+            }
+          }
+        },
+        {
+          "name": "7.2 Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"]
+            }
+          }
+        },
+        {
+          "name": "7.3 Create Calendar Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Final Arguments - Court No. 3 Item 14\",\n  \"date\": \"2026-10-24\",\n  \"time\": \"10:30 AM\",\n  \"type\": \"Hearing\",\n  \"location\": \"Supreme Court of India\",\n  \"matter\": \"Acme Infra SLP\",\n  \"notes\": \"Lead Senior Counsel arguing preliminary objection\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            }
+          }
+        },
+        {
+          "name": "7.4 Get Calendar Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["events"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. AI Legal Drafting",
+      "item": [
+        {
+          "name": "8.1 Save Generated Draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"draftType\": \"Legal Notice (Sec 138 NI Act)\",\n  \"instructions\": \"Demand notice for recovery of unpaid invoices totaling Rs. 5,00,000 against dishonored cheque\",\n  \"content\": \"LEGAL NOTICE UNDER SECTION 138 OF NEGOTIABLE INSTRUMENTS ACT\\n\\nTo,\\n[Recipient / Drawer Details]\\n\\nUnder instructions from our client, you issued Cheque No. 441021 for Rs. 5,00,000 which was dishonored with endorsement 'Funds Insufficient'. You are hereby called upon to clear payment within 15 days.\",\n  \"matter\": \"Commercial Recovery - Acme Tech\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/drafts",
+              "host": ["{{baseUrl}}"],
+              "path": ["drafts"]
+            }
+          }
+        },
+        {
+          "name": "8.2 Get All Saved Drafts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drafts",
+              "host": ["{{baseUrl}}"],
+              "path": ["drafts"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Master Data & Taxonomies",
+      "item": [
+        {
+          "name": "9.1 Get Master Data Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/masters/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["masters", "stats"]
+            }
+          }
+        },
+        {
+          "name": "9.2 Get Master Items by Category",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/masters?category=Court&search=High",
+              "host": ["{{baseUrl}}"],
+              "path": ["masters"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Court"
+                },
+                {
+                  "key": "search",
+                  "value": "High"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "9.3 Create New Master Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Court\",\n  \"name\": \"Gujarat High Court\",\n  \"code\": \"GHC\",\n  \"subType\": \"High Court\",\n  \"jurisdiction\": \"State of Gujarat\",\n  \"description\": \"High Court of Gujarat at Ahmedabad\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/masters",
+              "host": ["{{baseUrl}}"],
+              "path": ["masters"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Lead & Demo Inquiries",
+      "item": [
+        {
+          "name": "10.1 Capture Demo Booking Lead",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kind\": \"demo\",\n  \"name\": \"Vikramaditya Singhania\",\n  \"email\": \"vikram@singhania-law.in\",\n  \"mobile\": \"+91 99887 76655\",\n  \"organisation\": \"Singhania & Partners Law Chambers\",\n  \"role\": \"Managing Partner\",\n  \"orgSize\": \"21-50\",\n  \"demoDate\": \"2026-10-15\",\n  \"useCases\": [\"AI Legal Research\", \"Contract Review\", \"Case Law Precedents\"],\n  \"message\": \"Interested in enterprise deployment for 30 advocates in Delhi and Mumbai.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/leads",
+              "host": ["{{baseUrl}}"],
+              "path": ["leads"]
+            }
+          }
+        },
+        {
+          "name": "10.2 Get All Demo Leads",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leads",
+              "host": ["{{baseUrl}}"],
+              "path": ["leads"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Admin Management",
+      "item": [
+        {
+          "name": "11.1 Get Admin Platform Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "stats"]
+            }
+          }
+        },
+        {
+          "name": "11.2 Get All Users (Admin Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"]
+            }
+          }
+        },
+        {
+          "name": "11.3 Update User Bitmask Permissions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numericMask\": 1023\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}/permissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{userId}}", "permissions"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

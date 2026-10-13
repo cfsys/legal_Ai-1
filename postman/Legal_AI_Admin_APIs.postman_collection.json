@@ -1,0 +1,1233 @@
+{
+  "info": {
+    "name": "Legal AI - Admin Suite",
+    "_postman_id": "legal-ai-admin-collection-v1",
+    "description": "Complete Postman API Collection for Legal AI / Themes AI Enterprise Admin Management Console with sample request payloads, query parameters, and Bearer token auth.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001/api",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sampleUserId",
+      "value": "6abf8c923b7a18a0377b268d",
+      "type": "string"
+    },
+    {
+      "key": "sampleFirmId",
+      "value": "firm-1",
+      "type": "string"
+    },
+    {
+      "key": "sampleSubAdminId",
+      "value": "6abf534b043a65a1ad149d88",
+      "type": "string"
+    },
+    {
+      "key": "sampleRoleId",
+      "value": "role-compliance",
+      "type": "string"
+    },
+    {
+      "key": "sampleMasterId",
+      "value": "6ac0979e8c590202597d3df5",
+      "type": "string"
+    },
+    {
+      "key": "sampleIntegrationId",
+      "value": "ecourts-api",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{adminToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01. Authentication & Session",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5001/api/health",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5001",
+              "path": [
+                "api",
+                "health"
+              ]
+            },
+            "description": "Check if the Legal AI backend service is online."
+          }
+        },
+        {
+          "name": "Admin Login (Super Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var json = pm.response.json();",
+                  "    if (json.token) {",
+                  "        pm.collectionVariables.set('adminToken', json.token);",
+                  "        console.log('Admin token saved to collection variable:', json.token);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@themes.ai\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Log in as Super Admin. Automatically stores the JWT in {{adminToken}}."
+          }
+        },
+        {
+          "name": "Get Current Session (Me)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Fetch currently authenticated user details, permissions, and session info."
+          }
+        }
+      ]
+    },
+    {
+      "name": "02. Dashboard & Platform Overview",
+      "item": [
+        {
+          "name": "Get Platform Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/overview",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "overview"
+              ]
+            },
+            "description": "Fetch aggregate statistics, advocate counts, firm counts, queries, and revenue."
+          }
+        },
+        {
+          "name": "Get Database Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/db-status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "db-status"
+              ]
+            },
+            "description": "Check MongoDB connection status, latency, and collection metrics."
+          }
+        },
+        {
+          "name": "Connect Custom Database",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mongoUri\": \"mongodb+srv://user:pass@cluster0.example.mongodb.net/themes-ai?retryWrites=true&w=majority\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/connect-db",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "connect-db"
+              ]
+            },
+            "description": "Connect to a custom MongoDB instance or Atlas cluster on the fly."
+          }
+        }
+      ]
+    },
+    {
+      "name": "03. Advocates & Users Management",
+      "item": [
+        {
+          "name": "Get All Advocates / Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?search=&role=&status=&firmId=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by name, email, or bar number"
+                },
+                {
+                  "key": "role",
+                  "value": "",
+                  "description": "Filter by role (e.g., 2, 3, 4)"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "Filter by status: 1 (Active), 2 (Pending), 3 (Suspended)"
+                },
+                {
+                  "key": "firmId",
+                  "value": "",
+                  "description": "Filter by Law Firm ID"
+                }
+              ]
+            },
+            "description": "List all advocates and team members across law firms."
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{sampleUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{sampleUserId}}"
+              ]
+            },
+            "description": "Retrieve a specific advocate or user profile."
+          }
+        },
+        {
+          "name": "Get User Login Session History",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{sampleUserId}}/login-history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{sampleUserId}}",
+                "login-history"
+              ]
+            },
+            "description": "View login IP addresses, timestamps, devices, and browser telemetry."
+          }
+        },
+        {
+          "name": "Create User / Advocate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Rajesh\",\n  \"lastName\": \"Sharma\",\n  \"email\": \"rajesh.sharma@sharmalegal.in\",\n  \"mobile\": \"+91 98200 12345\",\n  \"firmId\": \"firm-1\",\n  \"role\": 2,\n  \"professionalType\": \"Senior Advocate\",\n  \"credits\": 2500,\n  \"permissions\": 15,\n  \"password\": \"Password@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ]
+            },
+            "description": "Provision a new advocate in an enterprise law firm."
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Rajesh\",\n  \"lastName\": \"Sharma\",\n  \"mobile\": \"+91 98200 99999\",\n  \"status\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{sampleUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{sampleUserId}}"
+              ]
+            },
+            "description": "Update user personal info, status, or contact details."
+          }
+        },
+        {
+          "name": "Update User Permissions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"numericMask\": 31,\n  \"permissionsMap\": {\n    \"canDraftLegalDocs\": true,\n    \"canReviewContracts\": true,\n    \"canAccessResearchAI\": true,\n    \"canExportSummaries\": true,\n    \"canInviteAssociates\": false\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{sampleUserId}}/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{sampleUserId}}",
+                "permissions"
+              ]
+            },
+            "description": "Adjust bitmask or granular permissions for a user."
+          }
+        },
+        {
+          "name": "Allocate AI Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1500,\n  \"reason\": \"Quarterly Enterprise Credit Topup\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{sampleUserId}}/credits",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{sampleUserId}}",
+                "credits"
+              ]
+            },
+            "description": "Add or deduct AI tokens/credits from an advocate's wallet."
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{sampleUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{sampleUserId}}"
+              ]
+            },
+            "description": "Remove or offboard an advocate from the platform."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04. Multi-Tenant Law Firms",
+      "item": [
+        {
+          "name": "Get All Law Firms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/firms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "firms"
+              ]
+            },
+            "description": "List all multi-tenant law firms with active seats and tier information."
+          }
+        },
+        {
+          "name": "Create Law Firm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juris Corp Law Chambers\",\n  \"tier\": \"Enterprise\",\n  \"seatsLimit\": 50,\n  \"domain\": \"juriscorplegal.com\",\n  \"address\": \"Nariman Point, Marine Drive\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"contactEmail\": \"admin@juriscorplegal.com\",\n  \"contactPhone\": \"+91 22 4567 8900\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/firms",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "firms"
+              ]
+            },
+            "description": "Onboard a new law firm tenant."
+          }
+        }
+      ]
+    },
+    {
+      "name": "05. Master Data & Legal Taxonomies",
+      "item": [
+        {
+          "name": "Get All 15 Taxonomy Categories with Counts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/masters/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "masters",
+                "categories"
+              ]
+            },
+            "description": "Returns all 15 taxonomies (Court, Bench, Judge, Act, Section, Practice Area, Case Type, etc.) with record counts."
+          }
+        },
+        {
+          "name": "Get Master Data Records by Category",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/masters?category=Court&search=&page=1&limit=25",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "masters"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Court",
+                  "description": "Taxonomy category (e.g. Court, Bench, Judge, Act, Section)"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search keyword"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number"
+                },
+                {
+                  "key": "limit",
+                  "value": "25",
+                  "description": "Items per page"
+                }
+              ]
+            },
+            "description": "Fetch paginated records for a selected taxonomy category."
+          }
+        },
+        {
+          "name": "Create Master Data Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Court\",\n  \"name\": \"High Court of Madras\",\n  \"code\": \"MAD-HC\",\n  \"tier\": \"High Court\",\n  \"jurisdiction\": \"Tamil Nadu & Puducherry\",\n  \"description\": \"Charter High Court with principal seat in Chennai and permanent bench at Madurai\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/masters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "masters"
+              ]
+            },
+            "description": "Insert a new statutory or judicial taxonomy reference record."
+          }
+        },
+        {
+          "name": "Update Master Data Record",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"category\": \"Court\",\n  \"name\": \"High Court of Madras (Updated)\",\n  \"code\": \"MAD-HC\",\n  \"tier\": \"High Court\",\n  \"jurisdiction\": \"Tamil Nadu & Puducherry\",\n  \"description\": \"Updated legal description with jurisdiction notes.\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/masters/{{sampleMasterId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "masters",
+                "{{sampleMasterId}}"
+              ]
+            },
+            "description": "Update an existing master reference record."
+          }
+        },
+        {
+          "name": "Delete Master Data Record",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/masters/{{sampleMasterId}}?category=Court",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "masters",
+                "{{sampleMasterId}}"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "Court",
+                  "description": "Category of the record"
+                }
+              ]
+            },
+            "description": "Remove a taxonomy record."
+          }
+        }
+      ]
+    },
+    {
+      "name": "06. Sub-Admins Management & Delegation",
+      "item": [
+        {
+          "name": "Get All Sub-Admins",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sub-admins?search=&role=&status=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "sub-admins"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Filter by name or email"
+                },
+                {
+                  "key": "role",
+                  "value": "",
+                  "description": "Filter by role title"
+                },
+                {
+                  "key": "status",
+                  "value": "",
+                  "description": "1: Active, 2: Inactive"
+                }
+              ]
+            },
+            "description": "List all secondary administrators and their delegated permissions."
+          }
+        },
+        {
+          "name": "Create Sub-Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"priya_admin\",\n  \"fullName\": \"Priya Nair\",\n  \"email\": \"priya.nair@legalai.in\",\n  \"password\": \"subadmin123\",\n  \"role\": \"User Management Admin\",\n  \"department\": \"Client Onboarding\",\n  \"status\": 1,\n  \"permissions\": {\n    \"canView\": true,\n    \"canCreate\": true,\n    \"canEdit\": true,\n    \"canDelete\": false,\n    \"modules\": {\n      \"users\": {\n        \"access\": \"full\",\n        \"create\": true,\n        \"edit\": true,\n        \"delete\": false\n      },\n      \"masters\": {\n        \"access\": \"view\",\n        \"create\": false,\n        \"edit\": false,\n        \"delete\": false\n      },\n      \"roles\": {\n        \"access\": \"none\"\n      },\n      \"subAdmins\": {\n        \"access\": \"none\"\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/sub-admins",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "sub-admins"
+              ]
+            },
+            "description": "Create a delegated sub-administrator."
+          }
+        },
+        {
+          "name": "Update Sub-Admin Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Priya K. Nair\",\n  \"department\": \"Enterprise Operations\",\n  \"status\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/sub-admins/{{sampleSubAdminId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "sub-admins",
+                "{{sampleSubAdminId}}"
+              ]
+            },
+            "description": "Update sub-admin contact info, department, or activation status."
+          }
+        },
+        {
+          "name": "Update Sub-Admin Granular Permissions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissions\": {\n    \"canView\": true,\n    \"canCreate\": true,\n    \"canEdit\": true,\n    \"canDelete\": true,\n    \"modules\": {\n      \"users\": {\n        \"access\": \"full\",\n        \"create\": true,\n        \"edit\": true,\n        \"delete\": true\n      },\n      \"masters\": {\n        \"access\": \"full\",\n        \"create\": true,\n        \"edit\": true,\n        \"delete\": false\n      },\n      \"firms\": {\n        \"access\": \"view\"\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/sub-admins/{{sampleSubAdminId}}/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "sub-admins",
+                "{{sampleSubAdminId}}",
+                "permissions"
+              ]
+            },
+            "description": "Modify module-level access rules for a sub-admin."
+          }
+        },
+        {
+          "name": "Delete Sub-Admin",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/sub-admins/{{sampleSubAdminId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "sub-admins",
+                "{{sampleSubAdminId}}"
+              ]
+            },
+            "description": "Revoke and remove a sub-admin account."
+          }
+        }
+      ]
+    },
+    {
+      "name": "07. Roles & Permissions Management",
+      "item": [
+        {
+          "name": "Get All Admin Roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/roles?search=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "roles"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "Search by role name or code"
+                }
+              ]
+            },
+            "description": "List custom and predefined RBAC roles stored in MongoDB Atlas."
+          }
+        },
+        {
+          "name": "Create Admin Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Legal Research Auditor\",\n  \"code\": \"RESEARCH_AUDITOR\",\n  \"description\": \"Audits citation lookups, judicial search logs, and AI prompt compliance\",\n  \"isDefault\": false,\n  \"permissions\": {\n    \"canView\": true,\n    \"canCreate\": false,\n    \"canEdit\": false,\n    \"canDelete\": false,\n    \"modules\": {\n      \"audit\": {\n        \"access\": \"full\"\n      },\n      \"masters\": {\n        \"access\": \"view\"\n      },\n      \"aiQuotas\": {\n        \"access\": \"view\"\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/roles",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "roles"
+              ]
+            },
+            "description": "Define a new custom role template."
+          }
+        },
+        {
+          "name": "Update Admin Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated description for research auditor with export privileges\",\n  \"permissions\": {\n    \"canView\": true,\n    \"canCreate\": false,\n    \"canEdit\": true,\n    \"canDelete\": false\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/roles/{{sampleRoleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "roles",
+                "{{sampleRoleId}}"
+              ]
+            },
+            "description": "Modify an existing role template."
+          }
+        },
+        {
+          "name": "Delete Admin Role",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/roles/{{sampleRoleId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "roles",
+                "{{sampleRoleId}}"
+              ]
+            },
+            "description": "Delete a custom role definition."
+          }
+        },
+        {
+          "name": "Direct Apply Role To User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetUserId\": \"{{sampleUserId}}\",\n  \"targetUserType\": \"user\",\n  \"role\": \"Senior Associate\",\n  \"roleName\": \"Senior Associate\",\n  \"permissions\": {\n    \"canView\": true,\n    \"canCreate\": true,\n    \"canEdit\": true,\n    \"canDelete\": false\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/apply-role",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "apply-role"
+              ]
+            },
+            "description": "Instantly apply an existing role template to an employee, advocate, or sub-admin."
+          }
+        }
+      ]
+    },
+    {
+      "name": "08. Permissions Matrix & Modules",
+      "item": [
+        {
+          "name": "Get Permissions Matrix",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/permissions-matrix?firmId=",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "permissions-matrix"
+              ],
+              "query": [
+                {
+                  "key": "firmId",
+                  "value": "",
+                  "description": "Optional filter by firm ID"
+                }
+              ]
+            },
+            "description": "Grid comparison showing each advocate against granular platform capability columns."
+          }
+        },
+        {
+          "name": "Get System Legal Modules",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/modules",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "modules"
+              ]
+            },
+            "description": "Retrieve all 12 core functional modules from the Legal AI application."
+          }
+        }
+      ]
+    },
+    {
+      "name": "09. AI Quotas & Telemetry",
+      "item": [
+        {
+          "name": "Get AI Models & Token Quotas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/ai-quotas",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "ai-quotas"
+              ]
+            },
+            "description": "Inspect token quotas, model latency, daily allocations, and invocation counters."
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Security & Audit Logs",
+      "item": [
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/audit-logs?category=&action=&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "audit-logs"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "",
+                  "description": "Authentication, User Management, Master Data, Security"
+                },
+                {
+                  "key": "action",
+                  "value": "",
+                  "description": "Filter by action keyword"
+                },
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Number of logs to retrieve"
+                }
+              ]
+            },
+            "description": "Immutable compliance and security trail for SOC2/ISO27001."
+          }
+        },
+        {
+          "name": "Get Security & Compliance Settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/security",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "security"
+              ]
+            },
+            "description": "Retrieve enterprise security controls, MFA rules, session timeout, and IP allowlist."
+          }
+        },
+        {
+          "name": "Update Security & Compliance Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mfaRequired\": true,\n  \"sessionTimeoutMinutes\": 30,\n  \"ipAllowlist\": [\n    \"103.21.244.0/24\",\n    \"192.168.1.0/24\"\n  ],\n  \"enforceStrongPasswords\": true,\n  \"failedLoginLockoutThreshold\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/security",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "security"
+              ]
+            },
+            "description": "Save updated security posture and lockout policies."
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Organisation & Firm Settings",
+      "item": [
+        {
+          "name": "Get Organisation Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/organisation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "organisation"
+              ]
+            },
+            "description": "Retrieve administrative organisation name, GSTIN, primary jurisdiction, and contact."
+          }
+        },
+        {
+          "name": "Update Organisation Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Themes AI - Legal Systems India\",\n  \"domain\": \"themes.ai\",\n  \"contactEmail\": \"legal@themes.ai\",\n  \"contactPhone\": \"+91 80 4567 8900\",\n  \"headquarters\": \"Bengaluru, Karnataka, India\",\n  \"supportEmail\": \"support@themes.ai\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/organisation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "organisation"
+              ]
+            },
+            "description": "Update the root corporate organisation profile."
+          }
+        }
+      ]
+    },
+    {
+      "name": "12. Subscriptions, Usage & Billing",
+      "item": [
+        {
+          "name": "Get Subscriptions Configuration",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/subscriptions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "subscriptions"
+              ]
+            },
+            "description": "View active enterprise subscription tiers, seat pools, and billing cycles."
+          }
+        },
+        {
+          "name": "Update Subscriptions Configuration",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPlan\": \"Enterprise Infinite\",\n  \"seatsAllocated\": 150,\n  \"autoRenew\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/subscriptions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "subscriptions"
+              ]
+            },
+            "description": "Update billing parameters and contracted seats."
+          }
+        },
+        {
+          "name": "Get Real-time Usage Telemetry",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/usage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "usage"
+              ]
+            },
+            "description": "Compute API call counts, vector storage utilization, and query load graphs."
+          }
+        }
+      ]
+    },
+    {
+      "name": "13. Third-Party Legal Integrations",
+      "item": [
+        {
+          "name": "Get All Integrations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/admin/integrations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "integrations"
+              ]
+            },
+            "description": "List integrations like eCourts, High Court Scrapers, DigiLocker, Razorpay."
+          }
+        },
+        {
+          "name": "Update Integration Status / API Key",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isEnabled\": true,\n  \"apiKey\": \"sk-live-ecourts-production-key-9921\",\n  \"webhookUrl\": \"https://api.themes.ai/webhooks/ecourts\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/integrations/{{sampleIntegrationId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "integrations",
+                "{{sampleIntegrationId}}"
+              ]
+            },
+            "description": "Toggle on/off an integration and update its API credentials."
+          }
+        }
+      ]
+    }
+  ]
+}

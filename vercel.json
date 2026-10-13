@@ -30,8 +30,16 @@
       "destination": { "service": "backend-customer" }
     },
     {
+      "source": "/assets/(.*)",
+      "destination": { "service": "customer", "path": "/assets/$1" }
+    },
+    {
+      "source": "/(.*\\.(?:js|css|svg|ico|png|jpg|jpeg|webp|woff|woff2|ttf|json))",
+      "destination": { "service": "customer", "path": "/$1" }
+    },
+    {
       "source": "/(.*)",
-      "destination": { "service": "customer" }
+      "destination": { "service": "customer", "path": "/index.html" }
     }
   ]
 }

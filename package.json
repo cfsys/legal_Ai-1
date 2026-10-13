@@ -2,7 +2,7 @@
   "name": "legal-ai-fullstack",
   "version": "1.0.0",
   "description": "Legal AI Enterprise Fullstack - Unified Architecture for Admin and Customer Portals",
-  "scripts": {
+    "build": "npm --prefix frontend/customer run build",
     "start:backend": "npm --prefix backend/customer start",
     "start:frontend": "npm --prefix frontend/customer run dev",
     "start:backend:admin": "npm --prefix backend/admin start",

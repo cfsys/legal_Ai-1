@@ -38,38 +38,62 @@ app.use(
   })
 );
 
-// 2. Strict CORS Configuration (Restrict to authorized frontend origins)
-const allowedOrigins = [
+// 2. Dynamic CORS Configuration (Supports local dev, production domains, and Vercel deployments)
+const defaultAllowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:3000',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:5174',
   'http://127.0.0.1:3000',
-  process.env.CLIENT_URL,
-].filter(Boolean);
+  'https://legalai-phi.vercel.app',
+];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+const envOrigins = (process.env.CLIENT_URL || '')
+  .split(',')
+  .map((url) => url.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [...defaultAllowedOrigins, ...envOrigins];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (e.g. mobile apps, curl, Postman, server-to-server)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Allow exact matches in allowedOrigins
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Automatically allow any Vercel deployment (preview or production)
+    try {
+      const parsedUrl = new URL(origin);
+      if (parsedUrl.hostname.endsWith('.vercel.app')) {
         return callback(null, true);
       }
-      return callback(new Error('Blocked by CORS security policy'));
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'Cache-Control',
-      'Pragma',
-      'Expires',
-      'Accept',
-    ],
-  })
-);
+    } catch (_) {}
+
+    return callback(new Error('Blocked by CORS security policy'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Cache-Control',
+    'Pragma',
+    'Expires',
+    'Accept',
+  ],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 
 // 3. Body parsers with safe memory limits (reduced from 50mb to 15mb to prevent DoS)
 app.use(express.json({ limit: '15mb' }));

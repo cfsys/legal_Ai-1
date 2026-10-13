@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
-const { getIsMongooseConnected } = require('../config/db');
+const { getIsMongooseConnected, connectDB } = require('../config/db');
 const { memoryStore } = require('../services/storage');
 const APP_STRINGS = require('../constants/appStrings');
 const { sendSuccess, sendError } = require('../middleware/responseHandler');
@@ -42,6 +42,10 @@ const registerUser = async (req, res) => {
 
     const otp = generateOtpCode();
     const otpexpiriesin = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+    if (!getIsMongooseConnected()) {
+      try { await connectDB(); } catch (_) {}
+    }
 
     if (getIsMongooseConnected()) {
       let existingUser = await User.findOne({ email: normalizedEmail });
@@ -188,6 +192,10 @@ const loginUser = async (req, res) => {
 
     const normalizedEmail = email.toLowerCase().trim();
 
+    if (!getIsMongooseConnected()) {
+      try { await connectDB(); } catch (_) {}
+    }
+
     if (getIsMongooseConnected()) {
       let user = await User.findOne({ email: normalizedEmail });
       if (!user && normalizedEmail.includes('@gmail.com')) {
@@ -318,6 +326,10 @@ const verifyOtp = async (req, res) => {
 
     const normalizedEmail = email.toLowerCase().trim();
     const enteredOtp = otp.toString().trim();
+
+    if (!getIsMongooseConnected()) {
+      try { await connectDB(); } catch (_) {}
+    }
 
     let user;
     if (getIsMongooseConnected()) {

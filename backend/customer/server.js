@@ -119,8 +119,22 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// 7. Ensure MongoDB Atlas is connected before servicing requests (Crucial for Vercel Serverless)
+const { getIsMongooseConnected } = require('./config/db');
+app.use(async (req, res, next) => {
+  if (!getIsMongooseConnected()) {
+    try {
+      await connectDB();
+    } catch (err) {
+      console.warn('[DB Middleware Notice] Database connection attempt:', err.message);
+    }
+  }
+  next();
+});
+
 // Mount Customer Routes
 app.use('/api/auth', authRoutes);
+
 app.use('/api/customer/auth', authRoutes);
 app.use('/api/judgments', judgmentRoutes);
 app.use('/api/research', researchRoutes);

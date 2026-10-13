@@ -105,7 +105,7 @@ const registerUser = async (req, res) => {
       logger.info('Auth', `[Legal AI OTP] Registration OTP for ${normalizedEmail}: ${otp}`);
 
       // Dispatch real email OTP asynchronously
-      sendOtpEmail(normalizedEmail, otp, 'Registration Verification', firstName);
+      await sendOtpEmail(normalizedEmail, otp, 'Registration Verification', firstName);
 
       return sendSuccess(
         res,
@@ -156,7 +156,7 @@ const registerUser = async (req, res) => {
       }
 
       logger.info('Auth', `[Legal AI OTP] In-memory Registration OTP for ${normalizedEmail}: ${otp}`);
-      sendOtpEmail(normalizedEmail, otp, 'Registration Verification', firstName);
+      await sendOtpEmail(normalizedEmail, otp, 'Registration Verification', firstName);
 
       return sendSuccess(
         res,
@@ -254,7 +254,7 @@ const loginUser = async (req, res) => {
         logger.info('Auth', `[Legal AI OTP] Login OTP for ${normalizedEmail}: ${otp}`);
 
         // Dispatch real email OTP
-        sendOtpEmail(user.email, otp, 'Login Authorization', user.firstName);
+        await sendOtpEmail(user.email, otp, 'Login Authorization', user.firstName);
 
         return sendSuccess(
           res,
@@ -282,7 +282,7 @@ const loginUser = async (req, res) => {
         user.otpexpiriesin = otpexpiriesin;
 
         logger.info('Auth', `[Legal AI OTP] In-memory Login OTP for ${normalizedEmail}: ${otp}`);
-        sendOtpEmail(user.email, otp, 'Login Authorization', user.firstName);
+        await sendOtpEmail(user.email, otp, 'Login Authorization', user.firstName);
 
         return sendSuccess(
           res,
@@ -477,7 +477,7 @@ const resendOtp = async (req, res) => {
 
     logger.info('Auth', `[Legal AI OTP] Resent OTP for ${normalizedEmail}: ${otp}`);
 
-    sendOtpEmail(
+    await sendOtpEmail(
       user.email,
       otp,
       purpose === 'register' ? 'Registration Verification' : 'Login Authorization',

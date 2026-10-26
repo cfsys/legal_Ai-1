@@ -5,30 +5,19 @@
   "aiModels": [],
   "subAdmins": [],
   "userSessions": {
-    "6abf534b043a65a1ad149d88": [
+    "6ac339f104d965d6d1a69708": [
       {
-        "id": "sess-6abf534b043a65a1ad149d88-1791783891332",
+        "id": "sess-6ac339f104d965d6d1a69708-1791881451890",
         "status": "Active",
         "device": "Desktop",
         "browser": "Chrome on Windows 10/11",
         "ip": "171.61.165.64",
         "location": "Ahmedabad, Gujarat, India",
-        "loginTime": "12/10/2026, 11:14 AM",
+        "loginTime": "13/10/2026, 02:20 PM",
         "lastActive": "Just now",
-        "timestamp": 1791783891332
-      },
-      {
-        "id": "sess-6abf534b043a65a1ad149d88-1791783885004",
-        "status": "Completed",
-        "device": "Desktop",
-        "browser": "Chrome on Windows 10/11",
-        "ip": "171.61.165.64",
-        "location": "Ahmedabad, Gujarat, India",
-        "loginTime": "12/10/2026, 11:14 AM",
-        "lastActive": "Just now",
-        "timestamp": 1791783885004
+        "timestamp": 1791881451890
       }
     ]
   },
-  "lastUpdated": "2026-10-12T05:44:51.356Z"
+  "lastUpdated": "2026-10-13T08:50:51.915Z"
 }

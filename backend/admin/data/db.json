@@ -5,19 +5,19 @@
   "aiModels": [],
   "subAdmins": [],
   "userSessions": {
-    "6ac339f104d965d6d1a69708": [
+    "6abf534b043a65a1ad149d87": [
       {
-        "id": "sess-6ac339f104d965d6d1a69708-1791881451890",
+        "id": "sess-6abf534b043a65a1ad149d87-1793010897390",
         "status": "Active",
         "device": "Desktop",
         "browser": "Chrome on Windows 10/11",
         "ip": "171.61.165.64",
         "location": "Ahmedabad, Gujarat, India",
-        "loginTime": "13/10/2026, 02:20 PM",
+        "loginTime": "26/10/2026, 04:04 PM",
         "lastActive": "Just now",
-        "timestamp": 1791881451890
+        "timestamp": 1793010897390
       }
     ]
   },
-  "lastUpdated": "2026-10-13T08:50:51.915Z"
+  "lastUpdated": "2026-10-26T10:34:57.432Z"
 }
